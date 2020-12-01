@@ -1,4 +1,4 @@
-# convolution
+# Convolution
 
 This program computes 1D convolutions in Python.
 The program creates a vector of random numbers A of length N> 10, where N input will be requested by the user.
