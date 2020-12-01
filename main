@@ -1,0 +1,117 @@
+# Osia Dalampira-Kiprigli
+# AEM: 2744
+
+import random
+import numpy as np
+import soundfile as sf
+
+
+def MyConvolve(a, b):  # the method that implements the convolution of the signals
+                       # a, b represent the signals and are stored as lists
+    C = []
+
+    b.reverse()  # we reverse the second signal because it is reflected
+
+    for i in range(0, len(a) + len(b) - 1):  # the length of the final signal
+
+        sum = 0                 # variable sum represents each value of the new signal
+        length = len(b) - 1     # variable length is to calculate the starting and ending points between which we multiplay the signals
+
+        if i >= len(a):         # if the counter is grater of the length of the first signal, this means that
+            k = len(a) - 1      # the head of signal b is left out
+        else:
+            k = i               # the head of signal b is not left out
+
+        if (len(b) <= i):       # if the counter is grater or equal to the length we need to adjust the starting and ending point
+            length = length - (i - k)
+
+        if (length == 0):       # if length==0 this means that this is our last value and at the next step the tail is going to be left out
+            sum = a[k] * b[0]   # so we know that we only mutiply one value and then we return the new signal C
+            C.append(sum)
+            return C
+
+        for j in range(length, -1, -1):  # we begin mutiplying our signals in a reverse order starting from the ending barrier we have set
+            sum = sum + a[k] * b[j]     # the representation of the formula
+            k = k - 1
+            if (k < 0):                 # k is the index of signal a, so if its value goes below zero we break the loop
+                break
+
+        C.append(sum)                   # we append the value to the new signal C
+
+    return C
+
+
+print("Give the size of signal A.")
+
+number = input()
+try:
+    number = int(float(number))  #We covert any given number that is not an integer to an integer, so as to proceed with the execution
+except:
+    number = None
+
+while number == None or number<=10  :  #if the user's input is not correct, we repeat until he enters a correct one
+    print("Caution! The size must be greater than 10! All float values will automatically"
+          " be changed to integers.\nGive size: ")
+    number = input()
+    try:
+        number = int(float(number)) #convert to integer if float
+    except:
+        number = None
+
+
+A = list()                      #we create the list to store the first signal
+
+for i in range(0,number):       #we randomly generate the numbers of the first signal
+    rand_num = random.random()
+    A.append(rand_num)
+
+B = [1/5, 1/5, 1/5, 1/5, 1/5]   #the second signal
+
+
+print("Signal A: " + str(A))
+print("Signal B: " + str(B))
+
+print("My convolution: " + str(MyConvolve(A , B)))
+
+#print(np.convolve(A, B))   #python function to check results
+
+print()
+print("-----------------------------------------------------------------------")
+print()
+
+
+filename = "sample_audio.wav"       #first file
+data1, fs = sf.read(filename, dtype='float32')
+data1 = data1[0 : 3000]              #we get a sample of the file
+data1= data1.tolist()               #and we convert it to list
+
+
+filename = "pink_noise.wav"         #second file
+data2, fs = sf.read(filename, dtype='float32')
+data2 = data2[0 : 2000]              #similarly we get a sample of the file and convert it to a list
+data2= data2.tolist()
+
+
+#print(np.convolve(data1, data2)) #python function to check results
+waves2 = MyConvolve(data1 , data2)
+print("My convolution of audio files: "+str(waves2))
+
+sf.write('pinkNoise_sampleAudio.wav', waves2, samplerate=fs)  #we write the result to a new file
+
+mean = 0                                                #we generate white noise from
+std = 1                                                 #samples from a
+num_samples = 1000                                      #Gaussian distribution
+samples = np.random.normal(mean, std, size=num_samples)
+samples = samples.tolist()
+
+C = []
+#print(np.convolve(data1, samples)) #pyhton fuction to check results
+waves2 = MyConvolve(data1, samples)
+
+print()
+print("-----------------------------------------------------------------------")
+print()
+
+print("My convolution with white noise: "+str(waves2))
+
+sf.write('whiteNoise_sampleAudio.wav', waves2, samplerate=fs) #we write the result to a file
