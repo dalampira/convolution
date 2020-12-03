@@ -1,6 +1,3 @@
-# Osia Dalampira-Kiprigli
-# AEM: 2744
-
 import random
 import numpy as np
 import soundfile as sf
